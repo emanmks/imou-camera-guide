@@ -1,0 +1,15 @@
+# Core dependencies for all examples
+opencv-python>=4.8.0
+requests>=2.31.0
+aiohttp>=3.8.0
+
+# Local network / ONVIF
+onvif-zeep>=0.2.12
+python-nmap>=0.7.1
+
+# Cloud libraries
+imouapi>=1.0.0
+pyimouapi>=1.2.0
+
+# Utilities
+python-dotenv>=1.0.0
