@@ -19,8 +19,8 @@ import time
 import requests
 
 # ================= CONFIGURATION =================
-APP_ID = "YOUR_APP_ID"
-APP_SECRET = "YOUR_APP_SECRET"
+APP_ID = "lc9831fd11e8b54fa8"
+APP_SECRET = "7122dd4aac8942b7977a3accd4277b"
 
 # Region endpoints (choose based on your account region):
 # Singapore:  https://openapi.easy4ip.com/openapi
@@ -64,7 +64,9 @@ def api_call(api: str, payload: dict, token: str = None) -> dict:
     resp.raise_for_status()
     data = resp.json()
 
-    # Imou wraps responses in a result object
+    # Imou wraps responses in a result object, and data is inside result.data
+    if "result" in data and "data" in data["result"]:
+        return data["result"]["data"]
     if "result" in data:
         return data["result"]
     return data
@@ -83,7 +85,11 @@ def get_access_token() -> str:
 def list_devices(token: str):
     """List all devices bound to the account."""
     print("\nListing devices...")
-    result = api_call("deviceBaseList", {}, token=token)
+    result = api_call(
+        "deviceBaseList",
+        {"bindId": -1, "limit": 50, "type": "bindAndShare", "needApInfo": True},
+        token=token,
+    )
     devices = result.get("deviceList", [])
     print(f"Found {len(devices)} device(s)\n")
     for dev in devices:

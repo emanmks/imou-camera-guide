@@ -42,18 +42,22 @@ def main():
     token = api_call("accessToken", {}).get("accessToken")
 
     print("Fetching device list...\n")
-    result = api_call("deviceBaseList", {"limit": 100}, token=token)
+    # Correct parameters for deviceBaseList (tested 2026-06-01)
+    result = api_call(
+        "deviceBaseList",
+        {"bindId": -1, "limit": 50, "type": "bindAndShare", "needApInfo": True},
+        token=token,
+    )
     devices = result.get("deviceList", [])
 
     print(f"Total devices: {len(devices)}\n")
     for d in devices:
         print(f"  Device ID    : {d.get('deviceId')}")
-        print(f"  Name         : {d.get('name')}")
-        print(f"  Model        : {d.get('deviceModel')}")
-        print(f"  Status       : {d.get('status')}")
-        print(f"  Firmware     : {d.get('version')}")
-        print(f"  Channels     : {d.get('channelNum')}")
-        print(f"  Capabilities : {d.get('ability')}")
+        # channel info is nested under channels[]
+        channels = d.get("channels", [])
+        ch_names = [c.get("channelName", "") for c in channels]
+        print(f"  Name         : {', '.join(ch_names) if ch_names else d.get('deviceId')}")
+        print(f"  Channels     : {len(channels)}")
         print()
 
 

@@ -59,9 +59,14 @@ def register_webhook():
     """Register webhook callback URL with Imou."""
     token = get_token()
     print(f"Registering webhook: {WEBHOOK_URL}")
+    # callbackFlag and status are required (tested 2026-06-01)
     result = api_call(
         "setMessageCallback",
-        {"callbackUrl": WEBHOOK_URL},
+        {
+            "callbackFlag": "alarm,deviceStatus",
+            "callbackUrl": WEBHOOK_URL,
+            "status": "on",
+        },
         token=token,
     )
     print(f"Webhook registered: {result}")

@@ -43,14 +43,18 @@ This guide covers all methods to programmatically capture video from Imou camera
 
 ## Region Endpoints
 
-Choose the endpoint matching where your Imou account was registered:
+Choose the endpoint matching where your Imou account was registered. The `accessToken`
+response also returns `currentDomain` — always use that domain for subsequent calls.
 
-| Region | Endpoint |
-|---|---|
-| Singapore / Asia-Pacific | `https://openapi.easy4ip.com/openapi` |
-| Frankfurt / Europe | `https://openapi-fra.easy4ip.com/openapi` |
-| Oregon / Americas | `https://openapi-or.easy4ip.com/openapi` |
-| China mainland | `https://openapi.easy4ip.com/openapi` |
+| Region | Initial Endpoint | `currentDomain` example |
+|---|---|---|
+| Singapore / Asia-Pacific | `https://openapi.easy4ip.com/openapi` | `openapi-sg.easy4ip.com` |
+| Frankfurt / Europe | `https://openapi-fra.easy4ip.com/openapi` | `openapi-fra.easy4ip.com` |
+| Oregon / Americas | `https://openapi-or.easy4ip.com/openapi` | `openapi-or.easy4ip.com` |
+| China mainland | `https://openapi.easy4ip.com/openapi` | `openapi.easy4ip.com` |
+
+> **Tip:** Call `accessToken` on the initial endpoint, read `result.data.currentDomain`,
+> then use that domain for all other API calls.
 
 ---
 
@@ -60,12 +64,23 @@ Direct HTTP POST calls to Imou's REST API. All requests must be signed.
 
 **Authentication flow:**
 1. Call `accessToken` with signed request (no token needed)
-2. Receive `accessToken` valid for a limited time
-3. Include `token` in subsequent request payloads
+2. Receive `accessToken` and `currentDomain` in `result.data`
+3. Use `currentDomain` for all subsequent calls
+4. Include `token` in the `params` object of subsequent requests
 
 **Signature algorithm:**
 ```python
 sign = md5(f"time:{timestamp},nonce:{nonce},appSecret:{APP_SECRET}")
+```
+
+**Device listing** requires specific parameters (tested live):
+```python
+api_call("deviceBaseList", {
+    "bindId": -1,
+    "limit": 50,
+    "type": "bindAndShare",
+    "needApInfo": True,
+})
 ```
 
 **Python example:** [`examples/cloud/official_api_raw.py`](../examples/cloud/official_api_raw.py)

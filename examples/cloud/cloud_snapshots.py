@@ -46,8 +46,9 @@ def get_token():
 def request_snapshot(token):
     """Request snapshot via cloud API."""
     print("Requesting snapshot...")
+    # NOTE: deviceSnap is deprecated; setDeviceSnapEnhanced is the current endpoint.
     result = api_call(
-        "deviceSnap",
+        "setDeviceSnapEnhanced",
         {"deviceId": DEVICE_ID, "channelId": "0"},
         token=token,
     )
