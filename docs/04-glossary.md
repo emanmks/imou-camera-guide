@@ -18,3 +18,10 @@ Common terms used throughout this guide.
 | **Safety Code** | Default password printed on the camera's physical label |
 | **Subtype** | Stream quality selector: 0=main/HD, 1=sub/SD |
 | **WS-Discovery** | Web Services Dynamic Discovery — used by ONVIF to find devices on LAN |
+| **kitToken** | Time-limited device token for WebVideo SDK browser player (from `getKitToken` API) |
+| **WebVideo SDK** | Browser-based WASM-decoded WebSocket RTSP player (`imou-player.js`) |
+| **WasmLib** | WebAssembly decoder libraries required by the WebVideo SDK |
+| **currentDomain** | Region-specific API URL returned by `accessToken`; must override initial URL for all subsequent calls |
+| **Live Console** | GUI at `open.imoulife.com/consoleNew/vas/live` for manual stream management and H5 page config |
+| **Things Model** | IoT device protocol using numeric property references (ref IDs) instead of string abilities |
+| **abilityRefs** | Comma-separated list of numeric IoT property references used for Things Model device configuration |

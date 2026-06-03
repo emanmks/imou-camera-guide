@@ -345,14 +345,37 @@ Pushed to: https://github.com/emanmks/imou-camera-guide
 
 ---
 
-## 12. Untested / Next Steps
+## 12. Improvements from pyimouapi SDK Analysis (2026-06-03)
+
+The official pyimouapi SDK (v1.2.7, https://github.com/Imou-OpenPlatform/Py-Imou-Open-Api)
+was analyzed in depth. Key improvements applied to codebase:
+
+| Issue | Fix Applied |
+|---|---|
+| Missing `currentDomain` redirect handling | All cloud examples now parse and use `currentDomain` from auth response |
+| Missing token auto-refresh on `TK1002` | All clients retry with fresh token on `TK1002` |
+| Wrong device listing endpoint | Added `listDeviceDetailsByPage` as preferred endpoint alongside `deviceBaseList` |
+| No snapshot wait time | Added configurable `SNAP_WAIT_SECONDS` (default 3) before downloading snapshot URL |
+| No stream status flow | Implemented `getLiveStreamInfo → bindDeviceLive → retry` (SDK two-step pattern) |
+| Missing API error codes | Added known error codes table and handling |
+| No WebVideo SDK support | Added B8 (getKitToken) and B9 (WebVideo browser player) examples |
+| No browser streaming docs | Added `docs/06-browser-streaming.md` |
+| Missing glossary entries | Added kitToken, WebVideo SDK, WasmLib, currentDomain, Things Model terms |
+
+---
+
+## 13. Untested / Next Steps
 
 | Feature | Status | Notes |
 |---|---|---|
-| PTZ control | Not tested | `controlMovePTZ` API available |
+| PTZ control | Not tested | `controlMovePTZ` API available in `device.py` |
 | Night vision mode | Not tested | `getNightVisionMode` / `setNightVisionMode` |
 | Device restart | Not tested | `restartDevice` available |
 | SD card status | Not tested | `deviceSdcardStatus` available |
-| NVR channel listing | Not tested | May need `deviceBaseDetailList` |
+| NVR channel listing | Not tested | May need `getIotDeviceDetailInfo` |
 | Alarm video clip download | Not tested | Not exposed in current API |
 | Local RTSP | Not tested | Requires LAN access |
+| WebVideo SDK browser player | Not tested | Requires kitToken + browser + server with COOP/COEP headers |
+| IoT Things Model devices | Not tested | `getIotDeviceProperties` / `setIotDeviceProperties` via numeric refs |
+| Battery device wake-up | Not tested | `wakeUpDevice` API |
+| getKitToken for WebVideo | Not tested | `getKitToken` endpoint |

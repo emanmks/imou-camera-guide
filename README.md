@@ -22,34 +22,40 @@ A comprehensive guide and working code examples for programmatically capturing v
    - [B5. Cloud Device Discovery](#b5-cloud-device-discovery)
    - [B6. Cloud Snapshots](#b6-cloud-snapshots)
    - [B7. Webhook Event Notifications](#b7-webhook-event-notifications)
-5. [Troubleshooting](./docs/03-troubleshooting.md)
-6. [Glossary](./docs/04-glossary.md)
+   - [B8. Get KitToken for Browser Player](#b8-get-kittoken-for-browser-player)
+   - [B9. WebVideo SDK Browser Player](#b9-webvideo-sdk-browser-player)
+5. [Category C: Home Assistant Component Reference](#category-c-home-assistant-component-reference)
+6. [Troubleshooting](./docs/03-troubleshooting.md)
+7. [Browser Streaming Guide](./docs/06-browser-streaming.md)
+8. [Glossary](./docs/04-glossary.md)
 
 ---
 
-## Overview
+## Overview — Recommendation: Prefer Local RTSP
 
-This repository covers **all practical approaches** to programmatically capture video from Imou cameras, organized into two base categories:
+| Approach | Cost | Latency | Network | Recommended for |
+|---|---|---|---|---|
+| **★ A. Local RTSP** | **Free** | ~0.5s | Same LAN | **Always preferred** if server has LAN access to cameras |
+| **B. Cloud API** | Traffic quota may incur cost | 3-10s | Any internet | Fallback when LAN access isn't possible |
 
-| Category | Connection | Use Case |
-|---|---|---|
-| **Local Network** | Same WiFi/LAN as camera | Low latency, no internet needed, direct control |
-| **Cloud Service** | Via Imou Open Platform API | Remote access, reuse mobile app account, NVR via cloud |
+**Rule of thumb:** If your server and camera are on the same network, use local RTSP (Category A). It's free, lower latency, and more reliable. The cloud API (Category B) is for remote access or when cameras are on a separate network.
 
 Each approach includes a **working Python example** you can run immediately after filling in your credentials.
 
-## Quick Start
+## Quick Start — RTSP (Recommended, Free)
+
+If your server is on the same network as the camera, **RTSP is the simplest & cheapest option** — no cloud fees, no API keys, no traffic quotas.
 
 ```bash
-# Install all dependencies
+# Install dependencies
 pip install -r requirements.txt
 
-# Local example: capture RTSP stream
-python examples/local/rtsp_direct.py
-
-# Cloud example: list devices and get live HLS URL
-python examples/cloud/official_api_raw.py
+# Edit the file to set your camera IP and password, then:
+python examples/local/rtsp_direct.py      # Capture video via ffmpeg
+python examples/local/rtsp_with_opencv.py # Frame-by-frame processing
 ```
+
+**Not on the same network?** See [Category B](#category-b-cloud-service-connection) for cloud API access (requires AppId/AppSecret, video traffic may incur costs).
 
 ---
 
@@ -208,11 +214,58 @@ Receive motion detection and alarm events via cloud webhooks instead of polling.
 
 > **Full guide:** See [`docs/02-cloud-service.md`](./docs/02-cloud-service.md)
 
+### B8. Get KitToken for Browser Player
+
+Generate a device-specific kitToken for use with the WebVideo SDK browser player.
+
+**File:** [`examples/cloud/get_kit_token.py`](./examples/cloud/get_kit_token.py)
+
+**Prerequisites:**
+- AppId and AppSecret
+- Device ID from discovery
+
+### B9. WebVideo SDK Browser Player
+
+Browser-based streaming using the Imou WebVideo SDK (WebSocket RTSP over WASM).
+Includes live view, PTZ, snapshot, recording, and two-way audio.
+
+**Files:**
+- Player page: [`examples/cloud/webvideo_player.html`](./examples/cloud/webvideo_player.html)
+- Setup script: [`examples/cloud/setup_webvideo_sdk.sh`](./examples/cloud/setup_webvideo_sdk.sh)
+- Node server: [`examples/cloud/webvideo_server.js`](./examples/cloud/webvideo_server.js)
+
+> **Full guide:** See [`docs/06-browser-streaming.md`](./docs/06-browser-streaming.md)
+
+---
+
+## Category C: Home Assistant Component Reference
+
+The `Imou-Home-Assistant.zip` contains a complete Home Assistant `custom_component`
+(`imou_life`) using the official `pyimouapi` SDK. It demonstrates production-grade
+integration patterns:
+
+| Platform | Entities | Key File |
+|----------|----------|----------|
+| `camera` | Live HLS stream + snapshot | `camera.py` |
+| `sensor` | Battery, storage, temperature, humidity | `sensor.py` |
+| `switch` | Motion detect, close camera, white light, etc. | `switch.py` |
+| `select` | Night vision mode, volume, device mode | `select.py` |
+| `button` | PTZ (4 dirs), restart device, mute | `button.py` |
+| `binary_sensor` | Door contact status | `binary_sensor.py` |
+| `config_flow` | AppId/AppSecret input, region selection, options | `config_flow.py` |
+| `coordinator` | Polling update coordinator (60s interval) | `coordinator.py` |
+
+**SDK source:** https://github.com/Imou-OpenPlatform/Py-Imou-Open-Api (v1.2.7+)
+
 ---
 
 ## Troubleshooting
 
 Common issues and fixes for each approach: [`docs/03-troubleshooting.md`](./docs/03-troubleshooting.md)
+
+## Browser Streaming Guide
+
+Detailed guide for the WebVideo SDK browser player: [`docs/06-browser-streaming.md`](./docs/06-browser-streaming.md)
 
 ## Glossary
 

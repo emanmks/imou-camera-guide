@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Imou WebVideo Player</title>
+  <link href="imou-player.css" rel="stylesheet">
+  <script src="imou-player.js"></script>
+</head>
+<body style="margin:20px;font-family:sans-serif;background:#1a1a1a;color:#fff;">
+  <h2>Imou WebVideo Player</h2>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+    <label>API Domain: <input id="domain" value="" placeholder="e.g. openapi-sg.easy4ip.com" style="width:250px;"></label>
+    <label>Device ID: <input id="deviceId" value="" placeholder="device SN" style="width:200px;"></label>
+    <label>kitToken: <input id="kitToken" value="" placeholder="Kt_..." style="width:400px;"></label>
+    <label>Channel: <input id="channelId" value="0" style="width:50px;"></label>
+    <label>Code/Key: <input id="code" value="" placeholder="(optional) encrypt key or device password" style="width:200px;"></label>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+    <label>Resolution:
+      <select id="streamId">
+        <option value="0">HD</option>
+        <option value="1">SD</option>
+      </select>
+    </label>
+    <label>Type:
+      <select id="type">
+        <option value="1">Live</option>
+        <option value="2">Playback</option>
+      </select>
+    </label>
+    <label>Record Type:
+      <select id="recordType">
+        <option value="cloud">Cloud</option>
+        <option value="localRecord">Local SD</option>
+      </select>
+    </label>
+    <button id="startBtn" style="padding:6px 20px;background:#f18d00;border:none;color:#fff;cursor:pointer;">Start</button>
+    <button id="captureBtn" style="padding:6px 20px;background:#555;border:none;color:#fff;cursor:pointer;">Capture Snapshot</button>
+  </div>
+
+  <div id="player" style="width:960px;height:540px;border:1px solid #333;"></div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    if (params.get("deviceId")) document.getElementById("deviceId").value = params.get("deviceId");
+    if (params.get("kitToken"))  document.getElementById("kitToken").value = params.get("kitToken");
+    if (params.get("domain"))    document.getElementById("domain").value = params.get("domain");
+    if (params.get("channelId")) document.getElementById("channelId").value = params.get("channelId");
+    if (params.get("code"))      document.getElementById("code").value = params.get("code");
+    if (params.get("streamId"))  document.getElementById("streamId").value = params.get("streamId");
+    if (params.get("type"))      document.getElementById("type").value = params.get("type");
+
+    let player = null;
+
+    function startPlayer() {
+      if (player) { player.destroy(); player = null; }
+
+      const config = {
+        id: "player",
+        width: 960,
+        height: 540,
+        deviceId: document.getElementById("deviceId").value.trim(),
+        channelId: document.getElementById("channelId").value.trim(),
+        token: document.getElementById("kitToken").value.trim(),
+        type: parseInt(document.getElementById("type").value),
+        streamId: parseInt(document.getElementById("streamId").value),
+        recordType: document.getElementById("recordType").value,
+        code: document.getElementById("code").value.trim(),
+        muted: false,
+        controls: true,
+        WasmLibPath: "WasmLib/",
+        handleError: (err) => console.error("Error:", err),
+        handleCallBack: (event) => console.log("Event:", event),
+      };
+
+      const domain = document.getElementById("domain").value.trim();
+      if (domain) config.domain = domain;
+
+      player = new imouPlayer(config);
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startPlayer);
+    document.getElementById("captureBtn").addEventListener("click", () => {
+      if (player) player.capture();
+    });
+
+    // Auto-start if params provided in URL
+    if (params.get("deviceId") && params.get("kitToken")) startPlayer();
+  </script>
+</body>
+</html>
